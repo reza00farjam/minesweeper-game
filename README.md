@@ -1,4 +1,4 @@
-# minesweeper
+# about
 
 this is a simple 20x10 2-player minesweeper game, written in python using tkinter.
 
