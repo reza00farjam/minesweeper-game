@@ -4,6 +4,19 @@ from tkinter import *
 from winsound import *
 import random
 import json
+import sys
+import os
+
+# =======================================================
+
+def resource_path(relative_path):
+    """
+    Get absolute path to resource, works for dev and for PyInstaller.
+    See more on topic here:
+        https://stackoverflow.com/questions/7674790/bundling-data-files-with-pyinstaller-onefile/7675014#7675014
+    """
+    
+    return os.path.join(getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__))), relative_path)
 
 # =======================================================
 
@@ -36,26 +49,26 @@ def sounds(select):
         return
     
     if select == 'bomb':
-        PlaySound(r'data\sounds\find_bomb.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\find_bomb.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'miss':
-        PlaySound(r'data\sounds\miss.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\miss.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'end':
-        PlaySound(r'data\sounds\end.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\end.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'click':
-        PlaySound(r'data\sounds\click.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\click.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'click2':
-        PlaySound(r'data\sounds\click2.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\click2.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'start':
-        PlaySound(r'data\sounds\start.wav', SND_FILENAME | SND_ASYNC)
+        PlaySound(resource_path(r'data\sounds\start.wav'), SND_FILENAME | SND_ASYNC)
     elif select == 'exit':
-        PlaySound(r'data\sounds\exit.wav', SND_FILENAME | SND_ASYNC)        
+        PlaySound(resource_path(r'data\sounds\exit.wav'), SND_FILENAME | SND_ASYNC)        
 
 # =======================================================
 
 def menu():
     global bombs_num, height, width, pl1_color, pl2_color, small_font, big_font, data
     
-    with open('data\data.json') as file:
+    with open(resource_path('data\data.json')) as file:
         data = json.load(file)
     
     bombs_num = options['mode'][data['mode']]['bombs']
@@ -69,12 +82,12 @@ def menu():
     root = Tk()
     root.title("Minesweeper")
     root.resizable(0, 0)
-    root.iconbitmap(r"data\icon\bomb.ico")
+    root.iconbitmap(resource_path(r"data\icon\bomb.ico"))
     root.configure(bg='#172a3a')
     
-    photo_start = PhotoImage(file = r"data\img\start.png").subsample(2, 2)
-    photo_setting = PhotoImage(file = r"data\img\setting.png").subsample(2, 2)
-    photo_exit = PhotoImage(file = r"data\img\exit.png").subsample(2, 2)
+    photo_start = PhotoImage(file = resource_path(r"data\img\start.png")).subsample(2, 2)
+    photo_setting = PhotoImage(file = resource_path(r"data\img\setting.png")).subsample(2, 2)
+    photo_exit = PhotoImage(file = resource_path(r"data\img\exit.png")).subsample(2, 2)
     
     def action(task):
         root.destroy()
@@ -99,7 +112,7 @@ def menu():
 def setting():
     sett = Tk()
     sett.title('Minesweeper -> Setting')
-    sett.iconbitmap(r".\data\icon\setting.ico")
+    sett.iconbitmap(resource_path(r".\data\icon\setting.ico"))
     sett.resizable(0, 0)
     sett.configure(bg='#172a3a')
     
@@ -165,13 +178,13 @@ def setting():
     
     def toggle(task):
         if task == 'off':
-            PlaySound(r'data\sounds\on.wav', SND_FILENAME | SND_ASYNC)
+            PlaySound(resource_path(r'data\sounds\on.wav'), SND_FILENAME | SND_ASYNC)
             data['sound'][0] = 'on'
             data['sound'][1] = on_off['bg'] = 'green'
             on_off['text'] = 'ON '
             on_off['command'] = lambda: toggle('on')
         else:
-            PlaySound(r'data\sounds\off.wav', SND_FILENAME | SND_ASYNC)
+            PlaySound(resource_path(r'data\sounds\off.wav'), SND_FILENAME | SND_ASYNC)
             data['sound'][0] = 'off'
             data['sound'][1] = on_off['bg'] = 'red'
             on_off['text'] = 'OFF'
@@ -193,7 +206,7 @@ def setting():
             data['player1'] = pl1_color_var.get()
             data['player2'] = pl2_color_var.get()
         
-        with open('data\data.json', 'w') as file:
+        with open(resource_path('data\data.json'), 'w') as file:
             json.dump(data, file, indent=4)
         
         sett.destroy()
@@ -251,10 +264,10 @@ def start():
     main = Tk()
     main.title("Minesweeper")
     main.resizable(0, 0)
-    main.iconbitmap(r"data\icon\bomb.ico")
+    main.iconbitmap(resource_path(r"data\icon\bomb.ico"))
     
-    photo_bomb = PhotoImage(file = r"data\img\bomb.png").subsample(2, 2)
-    photo_reset = PhotoImage(file = r"data\img\reset.png").subsample(2, 2)
+    photo_bomb = PhotoImage(file = resource_path(r"data\img\bomb.png")).subsample(2, 2)
+    photo_reset = PhotoImage(file = resource_path(r"data\img\reset.png")).subsample(2, 2)
     
     for i in range(height):
         for j in range(width):
@@ -336,7 +349,6 @@ def start():
         
         if field[(row, col)] == -1:
             used.append((row, col))
-            sounds('bomb')
             
             Button(main, bg=pl1_color if flag else pl2_color, image=photo_bomb, state=DISABLED, padx=20, font=small_font).grid(row=row, column=col, sticky=E+W+S+N)
             
@@ -344,6 +356,9 @@ def start():
                 pl1 += 1
             else:
                 pl2 += 1
+            
+            if pl1 != bombs_num//2 + 1 and pl2 != bombs_num//2 + 1:
+                sounds('bomb')
         elif field[(row, col)]:
             flag = not flag
             used.append((row, col))
